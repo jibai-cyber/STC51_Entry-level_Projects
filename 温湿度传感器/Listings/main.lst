@@ -1,0 +1,56 @@
+C51 COMPILER V9.54   MAIN                                                                  01/16/2023 14:38:02 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\keil5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main.l
+                    -st) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <INTRINS.h>
+   2          #include <REGX52.H>
+   3          #include "LCD1602.h"
+   4          #include "Delay.h"
+   5          #include "DHT11.h"
+   6          #define uchar unsigned char
+   7          #define uint unsigned int
+   8          uchar rec_dat[15],RH,TH;   //用于显示的接收数据数组
+   9          
+  10          /*这里使用lcd1602来显示采集到的数据，lcd1602驱动程序在博主的51单片机系列博文�
+             -��有详细讲解*/
+  11          void main()
+  12          {
+  13   1         LCD_Init();   //lcd1602初始化
+  14   1         while(1)
+  15   1         {   
+  16   2             Delay(1500);    //DHT11上电后要等待1S以越过不稳定状态在此期间不能发送任何�
+             -�令
+  17   2              DHT11_receive(&RH,&TH);
+  18   2              rec_dat[0]='0'+(RH/10);
+  19   2              rec_dat[1]='0'+(RH%10);
+  20   2              rec_dat[2]='R';
+  21   2              rec_dat[3]='H';
+  22   2              rec_dat[4]=' ';
+  23   2              rec_dat[5]=' ';
+  24   2              rec_dat[6]='0'+(TH/10);
+  25   2              rec_dat[7]='0'+(TH%10);
+  26   2              rec_dat[8]='C';
+  27   2             LCD_ShowString(1,1,rec_dat);                      
+  28   2         }
+  29   1      }
+  30          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    102    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     17    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

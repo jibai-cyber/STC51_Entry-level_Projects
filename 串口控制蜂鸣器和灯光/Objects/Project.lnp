@@ -1,0 +1,8 @@
+".\Objects\UART.obj",
+".\Objects\main.obj",
+".\Objects\Delay.obj",
+".\Objects\Nixie.obj",
+".\Objects\Key.obj",
+".\Objects\Buzzer.obj" 
+TO ".\Objects\Project" 
+PRINT(".\Listings\Project.m51") RAMSIZE(256) 

@@ -1,0 +1,186 @@
+C51 COMPILER V9.54   MAIN                                                                  01/09/2023 17:26:00 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\keil5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main.l
+                    -st) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <REGX52.H>
+   2          #include <string.h>
+   3          #include "Delay.h"
+   4          #include "UART.h"
+   5          #include "LCD1602.h"
+   6          //#include "Key.h"
+   7          #include "I2C.h"
+   8          #include "AT24C02.h"
+   9          unsigned char KeyNumber0=0,str[32]={'\0'},str1[32]={'\0'},flag=0,cnt=0,keynum=10,flag1=0,cnt_dis=0,flag3=0
+             -,flag4=0,cnt_mem=0,flagt=1; //flag用于判断，避免某些程序反复执行
+  10          unsigned int timer0=0;  //笑死了，最开始把这个定义成unsigned char，结果一直没发现过�
+             -�255ms会自动变成0的，纠结了贼久
+  11          int cnt_Byte=0;
+  12          //好像已经不能再定义数据了，一定义就会说地址溢出...?
+  13          /*
+  14          *str 用于记录电脑向串口发送的字符串
+  15          *str1 用于备份str数组的数据
+  16          *flag 用于向串口发送数据时避免反复发送
+  17          *flag1 用于避免反复计数，到达3秒时停止
+  18          *flag3 用于避免反复写入数据
+  19          *flag4 用于避免反复读出数据
+  20          *cnt_Byte 用于记录每次发送的字符串长度
+  21          *cnt_dis 用于记录消失数据的个数
+  22          *cnt_mem 用于k3按下时记录数据长度，避免发送新的字符串时影响其长度
+  23          *cnt 用于记录发送的字符串长度（本来是想着判断是否超过16个字符来设定显示方
+             -式的，还没实现（懒）
+  24          *timer0 用于每隔1毫秒计数一次，满3000次即3秒，1000次即1秒
+  25          */
+  26          unsigned char Key()
+  27          {
+  28   1        
+  29   1        if(P3_1==0){Delay(20);while(P3_1==0);Delay(20);KeyNumber0=1;}
+  30   1        if(P3_0==0){Delay(20);while(P3_0==0);Delay(20);KeyNumber0=2;}
+  31   1        if(P3_2==0){Delay(20);while(P3_2==0);Delay(20);KeyNumber0=3;flag3=0;} //按下一次按键把flag3参数�
+             -��成0
+  32   1        if(P3_3==0){Delay(20);while(P3_3==0);Delay(20);KeyNumber0=4;flag4=0;}
+  33   1        
+  34   1        return KeyNumber0;
+  35   1      }
+  36          
+  37          void main()
+  38          {
+  39   1        unsigned char i,cnt_dis_mem=0;
+  40   1        UART_Init();    //串口初始化
+  41   1        LCD_Init();
+  42   1        while(1)
+  43   1        {
+  44   2          keynum = Key();
+  45   2          if(timer0>=2000)
+  46   2          {
+  47   3            flag1 = 0;  //停止timer0计数  
+  48   3            if(cnt_Byte>=0 && (keynum!=3 && keynum!=4))
+  49   3            {
+  50   4              UART_SendByte(str1[cnt_Byte]);  //向电脑发送消失的数据***注意***这里第一次用于缓存
+C51 COMPILER V9.54   MAIN                                                                  01/09/2023 17:26:00 PAGE 2   
+
+             -，并没有消失，所以上面定2s比较合适
+  51   4              str1[cnt_Byte--] = '\0';  //消失的数据在str1数组中抹除******注意******cnt_Byte在最后一
+             -轮循环中多减去了一次，所以cnt_mem应该要在此基础上加1
+  52   4              if(cnt_Byte<0) cnt_Byte = 0;
+  53   4              LCD_ShowString(1,1,"                "); //清屏
+  54   4              LCD_ShowString(1,1,str1); //更新LCD显示数据
+  55   4              cnt_dis++;  //记录消失的数据个数
+  56   4              Delay(1000);  //每隔1秒消除一次数据
+  57   4            }
+  58   3          }
+  59   2          
+  60   2          
+  61   2          
+  62   2          if(flag)
+  63   2          {
+  64   3            LCD_ShowString(1,1,"                "); //清屏
+  65   3            flag = 0;                               //防止多次执行
+  66   3            UART_Sendstring(str);   //向电脑发送字符串
+  67   3            if(cnt<=16)
+  68   3            {
+  69   4              LCD_ShowString(1,1,str);  //用LCD显示数据
+  70   4            }
+  71   3      //      else//未完待续
+  72   3      //      {
+  73   3      //        
+  74   3      //      }
+  75   3            strcpy(str1,str); //备份数据
+  76   3            cnt_Byte = strlen(str);
+  77   3            memset(str,'\0',sizeof(str)); //把str数组清0，以便再次发送数据使用
+  78   3            cnt = 0;    //cnt清0
+  79   3          }
+  80   2          else if(flag1)
+  81   2          {
+  82   3            Delay(1);
+  83   3            timer0++;
+  84   3          }
+  85   2          
+  86   2          
+  87   2          if(keynum==3 && flag3==0)
+  88   2          {
+  89   3            flag3 = 1;  //避免重复写入数据
+  90   3            
+  91   3            if(flag1==0)
+  92   3              cnt_Byte++;
+  93   3            
+  94   3            for(i=0;i<cnt_Byte;i++)
+  95   3            {
+  96   4              AT24C02_WriteByte(i,str1[i]); //把数据写入存储芯片
+  97   4              Delay(5);
+  98   4            }
+  99   3            cnt_mem = cnt_Byte; //按下一次k3刷新一次存储的字符串
+ 100   3            cnt_dis_mem = cnt_dis;
+ 101   3          }
+ 102   2        
+ 103   2          if(keynum==4 && flag4==0)
+ 104   2          {
+ 105   3            memset(str1,'\0',sizeof(str1)); //把str1数组清0，便于操作
+ 106   3            for(i=0;i<cnt_mem;i++)
+ 107   3              str1[i] = AT24C02_ReadByte(i);  //把芯片中数据读出，用str1数组记录
+ 108   3            
+ 109   3            
+ 110   3            flag4 = cnt_mem;  //暂用flag4记录数据
+C51 COMPILER V9.54   MAIN                                                                  01/09/2023 17:26:00 PAGE 3   
+
+ 111   3            
+ 112   3            //cnt_mem++;  //加1的原因见***注意***,这次的加1不用保存，避免下次读取数据出错
+ 113   3              //保证每次都先按过k3，避免每次一发数据就可能更新
+ 114   3            
+ 115   3            for(i=0;i<cnt_dis_mem-1;i++)
+ 116   3              str1[cnt_mem++] = '*';  //把消失的数据用*代替
+ 117   3            
+ 118   3            cnt_mem = flag4;  //恢复cnt_mem
+ 119   3            flag4 = 1;  //避免重复读出数据
+ 120   3            
+ 121   3            cnt_dis = 0;
+ 122   3            
+ 123   3            LCD_ShowString(1,1,"                ");
+ 124   3            LCD_ShowString(1,1,str1);     //更新数据
+ 125   3          }
+ 126   2        }
+ 127   1      }
+ 128          
+ 129          void UART_Routine() interrupt 4
+ 130          {
+ 131   1        unsigned char bytedata = '\0';
+ 132   1        if(RI==1)         //如果接收标志位为1，接收到了数据
+ 133   1        {
+ 134   2          bytedata = SBUF;
+ 135   2          if(bytedata != '\n')
+ 136   2          {
+ 137   3            strncat(str,&bytedata,1); //把接收到的数据以字符的方式一个个以str数组记录
+ 138   3            cnt++;
+ 139   3          }
+ 140   2          else  //注意这里和串口通信那个程序的区别，那个程序是每次会判断cnt的个数，�
+             -��后发现回车把数组清0，而这个程序不能在这里清0
+ 141   2          {
+ 142   3      //      memset(str,'\0',sizeof(str));
+ 143   3      //      cnt = 0;
+ 144   3            flag = 1;
+ 145   3            flag1 = 1;  //开始计时
+ 146   3            timer0 = 0; //计时数据清0
+ 147   3            KeyNumber0 = 0;
+ 148   3          }
+ 149   2          RI=0;         //接收标志位清0
+ 150   2        }
+ 151   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    648    ----
+   CONSTANT SIZE    =     17    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     78       3
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

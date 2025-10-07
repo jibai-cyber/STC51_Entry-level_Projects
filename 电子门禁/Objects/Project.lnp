@@ -1,0 +1,10 @@
+".\Objects\Delay.obj",
+".\Objects\MatrixKey.obj",
+".\Objects\Nixie.obj",
+".\Objects\UART.obj",
+".\Objects\main.obj",
+".\Objects\Buzzer.obj",
+".\Objects\DS18B20.obj",
+".\Objects\OneWire.obj" 
+TO ".\Objects\Project" 
+PRINT(".\Listings\Project.m51") RAMSIZE(256) 
