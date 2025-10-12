@@ -19,3 +19,6 @@ When I was a freshman in college. :flushed:
 
 Well, I believe that I'll act on it when I'm free.  
 If not, it means that that I'm not yet free enough. :sob:
+
+## Appreciation
+For the laboratory seniors and mentors who introduced me to this field.
