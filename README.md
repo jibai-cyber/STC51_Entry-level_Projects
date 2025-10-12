@@ -1,24 +1,31 @@
 # STC51_Entry-level_Projects
 
-## What can it offer at present?
-If you are patient enough to look, it has some relevant applicable algorithms and a relatively complete implementation process.  
+## What are these about?
+Some introductory projects to prepare for the later Multisensor system projects.  
 Below are some demonstration videos that I recorded myself. The extraction code is: 02hc
 
 > https://www.alipan.com/s/T4jDgnfJMRZ
 
-## When did I do it?
-When I was a freshman in college. :flushed:
+Including the results of each project.
 
-## Why upload this?
-1. The main purpose is to preserve these precious memories for that innocent boy back then, hoping to retrieve and refine them in the future. :yum:
-2. It would be my pleasure if it can offer you some reference or help. :kissing:
+## What are the requirements?
+See ___Requirement Document___.  
+Including but not limited to the following peripheral devices:  
+- LCD1602
+- matrix keyboard
+- UART
+- AT24C02
+- Timer (Including PWM generation)
+- ADC
+- LED nixie tube
+- IR remote control
+- HC-05
+- RBY-CO2
+- DHT11
 
 ## To-do task
 1. The code needs to be cleaned.
 2. Provide a instruction Doc.
-
-Well, I believe that I'll act on it when I'm free.  
-If not, it means that that I'm not yet free enough. :sob:
 
 ## Appreciation
 For the laboratory seniors and mentors who introduced me to this field.
